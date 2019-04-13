@@ -33,12 +33,15 @@ var config = {
 };
 
 
+var LEVEL_TIME = 1*60; // in seconds
+var BARKING_COOLDOWN = 3; // in seconds
+var BARK_SPEED = 200;
+var SLEEPING_TIME = 5; // in seconds
+
 var cake;
 var platforms;
 var bottoms;
 var dogs;
-var barkingCooldown = 1; // in seconds
-var sleepingTime = 5; // in seconds
 var barks;
 var barkingSound;
 
@@ -48,7 +51,6 @@ var apples = [];
 // numberOfCherries + numberOfApples needs to be less than 20
 var numberOfCherries = 10;
 var numberOfApples = 0;
-var levelTime = 2*60; // in seconds
 var timeText;
 
 var gameWonEvent;
@@ -117,7 +119,7 @@ function create ()
     dogs = this.physics.add.group();
     dog = dogs.create(100, 536, 'dog');
     dog.setData('barkingTimer', this.time.addEvent({
-		delay: barkingCooldown*1000,
+		delay: BARKING_COOLDOWN*1000,
 		callbackScope: this,
 		loop: true,
 		callback: function () {
@@ -127,7 +129,7 @@ function create ()
   
   
     dog.setData('sleepingTimer', this.time.addEvent({
-		delay: sleepingTime*1000,
+		delay: SLEEPING_TIME*1000,
 		callbackScope: this,
 		loop: true,
 		paused: true,
@@ -192,7 +194,7 @@ function create ()
 
 	// The time
 	gameWonEvent = this.time.addEvent({ 
-		delay: levelTime*1000, 
+		delay: LEVEL_TIME*1000, 
 		callback: onGameWon, 
 		callbackScope: this 
 		});
@@ -220,7 +222,7 @@ function updateFruits () {
 }
 
 function updateTime() {
-	var timeRemaining = levelTime - gameWonEvent.getElapsedSeconds();
+	var timeRemaining = LEVEL_TIME - gameWonEvent.getElapsedSeconds();
 	timeText.setText(Math.floor(timeRemaining/60).toString().padStart(2, '0')
 	                 + ':'
 	                 + Math.floor(timeRemaining % 60).toString().padStart(2, '0'));
@@ -238,10 +240,16 @@ function updateBarks() {
 }
 
 function bark(dog) {
-	barks.create(dog.x+100, dog.y-50, 'barking')
-	     .setAngle(315)
-	     .setVelocityX(100)
-	     .setVelocityY(-100);
+	dogMouth = dog.getCenter().add(new Phaser.Math.Vector2(100, -75));
+	// this is the offset of the cake from the mouth of the dog
+	offset = cake.getCenter().subtract(dogMouth);
+	rotation = offset.angle();
+	velocity = offset.normalize().scale(BARK_SPEED);
+	
+	barks.create(dogMouth.x, dogMouth.y, 'barking')
+	     .setRotation(rotation)
+	     .setVelocityX(velocity.x)
+	     .setVelocityY(velocity.y);
 
     barkingSound.play();
 	console.log('bark');
@@ -286,6 +294,8 @@ function onBarkHit(cake, bark) {
 	numberOfCherries--;
 	bark.destroy();
 	if (numberOfCherries <= 0) {
+		numberOfCherries = 0;
+		updateFruits();
 		this.events.emit('gamelost');
 	}
 }
