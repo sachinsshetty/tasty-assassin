@@ -33,31 +33,41 @@ var config = {
 };
 
 
+var cake;
+var platforms;
+var bottoms;
 var dogs;
 var barks;
 var barkingSound;
 
-var cursors;
+var cherries = [];
+var apples = [];
 
 var numberOfCherries = 0;
 var numberOfApples = 0;
 var levelTime = 2*60; // in seconds
-var gameOverEvent;
-var gameOver = false;
 var timeText;
-var platforms;
-var cake;
 
-var cherries = [];
-var apples = [];
+var gameWonEvent;
+var gameOver = false;
+
+var cursors;
+var keySpace;
+
 
 var game = new Phaser.Game(config);
 
 function preload ()
 {
+	// Background
     this.load.image('kitchen', 'assets/kitchen.png');
+    
+    // Platforms
     this.load.image('ground', 'assets/platform.png');
+    this.load.image('bottom', 'assets/bottom.png');
 
+
+	// Player
     this.load.spritesheet('cake', 'assets/cake-sprite.png', { frameWidth: 100, frameHeight: 100 });
 
     // Food assets
@@ -68,9 +78,9 @@ function preload ()
     this.load.image('strawberry', 'assets/food/Strawberry.png');
     this.load.image('tomato', 'assets/food/Tomato.png');
 
+    // Dog assets
     this.load.image('dog', 'assets/pets/dog.png');
     this.load.image('barking', 'assets/projectiles/barking.png');
-
     this.load.audio('barkingSound', 'assets/pets/barking_sound.mp3');
 
 }
@@ -80,22 +90,25 @@ function create ()
     //  A simple background for our game
     this.add.image(493, 300, 'kitchen');
 
-    //  The platforms group contains the ground and the 2 ledges we can jump on
+    //  The platforms group contains the platforms for the cake
     platforms = this.physics.add.staticGroup();
+    //  The bottoms group contains the floor that cats and dogs can walk on
+    bottoms = this.physics.add.staticGroup();
+
 
     //  Here we create the ground.
-
-    platforms.create(400, 632, 'ground').setScale(2).refreshBody();
+    bottoms.create(493, 616, 'bottom').setVisible(false);
 
     //  Now let's create some ledges
-    platforms.create(500, 325, 'ground').setVisible(false);
-    platforms.create(100, 325, 'ground').setVisible(false);
+    platforms.create(100, 334, 'ground').setVisible(false);
+    platforms.create(500, 334, 'ground').setVisible(false);
 
 
     // The player and its settings
-    //cake = this.physics.add.image(200, 50, 'cake').setScale(0.75);
     cake = this.physics.add.sprite(200, 50, 'cake');
-
+    //  Player physics properties. Give the little guy no bounce.
+    cake.setBounce(0);
+    cake.setCollideWorldBounds(true);
 
     // The dogs - currently only one
     dogs = this.physics.add.group();
@@ -105,13 +118,8 @@ function create ()
     barkingSound = this.sound.add('barkingSound');
 
 
-    //  Player physics properties. Give the little guy a slight bounce.
-    cake.setBounce(0.2);
-    cake.setCollideWorldBounds(true);
 
     //  Our player animations, turning, walking left and walking right.
-
-
     this.anims.create({
         key: 'left',
         frames: this.anims.generateFrameNumbers('cake', { start: 0, end: 3 }),
@@ -135,11 +143,11 @@ function create ()
 
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
-
     keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
 
-    //  The score
+    //  cherries contains 20 cherries and apples 20 apples that can be
+    //  set visible or invisible later
     for (var i = 0; i < 20; i++) {
 		cherries.push(this.add.image(16+24*i, 16, 'cherry'));
 		apples.push(this.add.image(16+24*i, 16, 'apple'));
@@ -151,15 +159,18 @@ function create ()
 		apple.setVisible(false);
 	}
 
-  //this.physics.add.collider(player, platforms);
-  this.physics.add.collider(cake, platforms);
 
-  //  Collide
-  this.physics.add.collider(dogs, platforms);
+    //  Collide
+    this.physics.add.collider(cake, platforms);
+    this.physics.add.collider(dogs, bottoms);
 
 	// The time
-	gameOverEvent = this.time.addEvent({ delay: levelTime*1000, callback: onGameOver, callbackScope: this });
-    timeText = this.add.text(795, 0, '', {font: '20pt Roboto', fill: '#000'}).setOrigin(1, 0);
+	gameWonEvent = this.time.addEvent({ 
+		delay: levelTime*1000, 
+		callback: onGameWon, 
+		callbackScope: this 
+		});
+    timeText = this.add.text(981, 0, '', {font: '20pt Roboto', fill: '#000'}).setOrigin(1, 0);
     updateTime();
 }
 
@@ -179,7 +190,7 @@ function updateFruits () {
 }
 
 function updateTime() {
-	var timeRemaining = levelTime - gameOverEvent.getElapsedSeconds();
+	var timeRemaining = levelTime - gameWonEvent.getElapsedSeconds();
 	timeText.setText(Math.floor(timeRemaining/60).toString().padStart(2, '0')
 	                 + ':'
 	                 + Math.floor(timeRemaining % 60).toString().padStart(2, '0'));
@@ -192,9 +203,8 @@ function bark() {
 	     .setVelocityX(100)
 	     .setVelocityY(-100);
 
-  barkingSound.play();
+    barkingSound.play();
 	console.log('bark');
-
 }
 
 
@@ -205,35 +215,39 @@ function update ()
         return;
     }
 
-if (cursors.left.isDown)
-{
-    cake.setVelocityX(-160);
+    if (cursors.left.isDown)
+    {
+        cake.setVelocityX(-160);
+        cake.anims.play('left', true);
+     }
+	else if (cursors.right.isDown)
+	{
+		cake.setVelocityX(160);
+		cake.anims.play('right', true);
+	}
+	else
+	{
+		cake.setVelocityX(0);
+		cake.anims.play('turn');
+	}
 
-    cake.anims.play('left', true);
+	if (cursors.up.isDown && cake.body.touching.down)
+	{
+		cake.setVelocityY(-330);
+	}
+	
+	if (keySpace.isDown) {
+		bark();
+	}
+
+	updateTime();
+	updateFruits();
+
 }
-else if (cursors.right.isDown)
-{
-    cake.setVelocityX(160);
-
-    cake.anims.play('right', true);
-}
-else
-{
-    cake.setVelocityX(0);
-
-    cake.anims.play('turn');
-}
-
-if (cursors.up.isDown && cake.body.touching.down)
-{
-    cake.setVelocityY(-330);
-}
-
-
-}
-function onGameOver () {
+function onGameWon () {
+	this.physics.pause();
+	this.add.text(493, 300, 'You won', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
 	gameOver = true;
-	this.add.text(400, 300, 'Game Over', {font: '20pt Roboto', fill: '#000'});
 }
 
 </script>
