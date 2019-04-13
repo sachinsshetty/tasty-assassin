@@ -33,6 +33,11 @@ var config = {
 };
 
 
+var LEVEL_TIME = 1*60; // in seconds
+var BARKING_COOLDOWN = 3; // in seconds
+var BARK_SPEED = 200;
+var SLEEPING_TIME = 5; // in seconds
+
 var cake;
 var platforms;
 var bottoms;
@@ -43,9 +48,9 @@ var barkingSound;
 var cherries = [];
 var apples = [];
 
-var numberOfCherries = 0;
+// numberOfCherries + numberOfApples needs to be less than 20
+var numberOfCherries = 10;
 var numberOfApples = 0;
-var levelTime = 2*60; // in seconds
 var timeText;
 
 var gameWonEvent;
@@ -113,6 +118,27 @@ function create ()
     // The dogs - currently only one
     dogs = this.physics.add.group();
     dog = dogs.create(100, 536, 'dog');
+    dog.setData('barkingTimer', this.time.addEvent({
+		delay: BARKING_COOLDOWN*1000,
+		callbackScope: this,
+		loop: true,
+		callback: function () {
+			bark(dog);
+	    },
+		}));
+  
+  
+    dog.setData('sleepingTimer', this.time.addEvent({
+		delay: SLEEPING_TIME*1000,
+		callbackScope: this,
+		loop: true,
+		paused: true,
+		callback: function () {
+			// The dog does not sleep any longer, so it starts to bark
+			dog.getData('sleepingTimer').paused = true;
+			dog.getData('barkingTimer').paused = false;
+		}
+		}));
 
     barks = this.physics.add.group({ allowGravity: false })
     barkingSound = this.sound.add('barkingSound');
@@ -163,15 +189,21 @@ function create ()
     //  Collide
     this.physics.add.collider(cake, platforms);
     this.physics.add.collider(dogs, bottoms);
+    
+    this.physics.add.overlap(cake, barks, onBarkHit, null, this);
 
 	// The time
 	gameWonEvent = this.time.addEvent({ 
-		delay: levelTime*1000, 
+		delay: LEVEL_TIME*1000, 
 		callback: onGameWon, 
 		callbackScope: this 
 		});
     timeText = this.add.text(981, 0, '', {font: '20pt Roboto', fill: '#000'}).setOrigin(1, 0);
     updateTime();
+    
+    // gamelost event
+    this.events.on('gamelost', onGameLost, this);
+    
 }
 
 function updateFruits () {
@@ -190,18 +222,34 @@ function updateFruits () {
 }
 
 function updateTime() {
-	var timeRemaining = levelTime - gameWonEvent.getElapsedSeconds();
+	var timeRemaining = LEVEL_TIME - gameWonEvent.getElapsedSeconds();
 	timeText.setText(Math.floor(timeRemaining/60).toString().padStart(2, '0')
 	                 + ':'
 	                 + Math.floor(timeRemaining % 60).toString().padStart(2, '0'));
 
 }
 
-function bark() {
-	barks.create(dog.x+100, dog.y-50, 'barking')
-	     .setAngle(315)
-	     .setVelocityX(100)
-	     .setVelocityY(-100);
+function updateBarks() {
+	// remove barks that are out of bounds
+	barks.children.each(function (child) {
+		if (Math.abs(child.x) > 1000 || Math.abs(child.y) > 1000) {
+			// the bark is definitely out of bounds
+			child.destroy()
+		}
+	});	
+}
+
+function bark(dog) {
+	dogMouth = dog.getCenter().add(new Phaser.Math.Vector2(100, -75));
+	// this is the offset of the cake from the mouth of the dog
+	offset = cake.getCenter().subtract(dogMouth);
+	rotation = offset.angle();
+	velocity = offset.normalize().scale(BARK_SPEED);
+	
+	barks.create(dogMouth.x, dogMouth.y, 'barking')
+	     .setRotation(rotation)
+	     .setVelocityX(velocity.x)
+	     .setVelocityY(velocity.y);
 
     barkingSound.play();
 	console.log('bark');
@@ -235,19 +283,35 @@ function update ()
 	{
 		cake.setVelocityY(-330);
 	}
-	
-	if (keySpace.isDown) {
-		bark();
-	}
 
 	updateTime();
 	updateFruits();
-
+	updateBarks();
 }
+
+function onBarkHit(cake, bark) {
+	// the cake was hit by a bark
+	numberOfCherries--;
+	bark.destroy();
+	if (numberOfCherries <= 0) {
+		numberOfCherries = 0;
+		updateFruits();
+		this.events.emit('gamelost');
+	}
+}
+
 function onGameWon () {
 	this.physics.pause();
+	this.time.removeAllEvents();
 	this.add.text(493, 300, 'You won', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
 	gameOver = true;
+}
+
+function onGameLost () {
+	this.physics.pause();
+	this.time.removeAllEvents();
+	this.add.text(493, 300, 'You lost', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
+	gameOver = true;	
 }
 
 </script>
