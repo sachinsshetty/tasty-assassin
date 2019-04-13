@@ -55,7 +55,9 @@ function preload ()
 {
     this.load.image('kitchen', 'assets/kitchen.png');
     this.load.image('ground', 'assets/platform.png');
-    this.load.image('cake', 'assets/cake2.png');
+
+    this.load.spritesheet('cake', 'assets/cake-sprite.png', { frameWidth: 32, frameHeight: 48 });
+    //this.load.image('cake', 'assets/cake2.png');
 
     // Food assets
     this.load.image('apple', 'assets/food/Apple.png');
@@ -87,7 +89,8 @@ function create ()
 
 
     // The player and its settings
-    cake = this.physics.add.image(200, 50, 'cake').setScale(0.75);
+    //cake = this.physics.add.image(200, 50, 'cake').setScale(0.75);
+    cake = this.physics.add.sprite(200, 50, 'cake');
 
 
     // The dogs - currently only one
@@ -201,36 +204,52 @@ function update ()
 
     if (cursors.left.isDown)
     {
-		    if (numberOfCherries > 0) {
+
+      cake.setVelocityX(-160);
+
+      cake.anims.play('left', true);
+
+/*		    if (numberOfCherries > 0) {
 			       numberOfCherries--;
 		    }
 
 		      updateFruits();
-    }
+  */  }
     else if (cursors.right.isDown)
     {
-		if (numberOfCherries < 10) {
+	/*	if (numberOfCherries < 10) {
 			   numberOfCherries++;
 		    }
 		      updateFruits();
+*/
+          cake.setVelocityX(160);
+
+          cake.anims.play('right', true);
+
     }
     else if (cursors.up.isDown)
     {
-		if (numberOfApples < 10) {
+	/*	if (numberOfApples < 10) {
 			   numberOfApples++;
 		     }
 		       updateFruits();
-    }
+  */  }
     else if (cursors.down.isDown)
     {
-		if (numberOfApples > 0) {
+	/*	if (numberOfApples > 0) {
 			   numberOfApples--;
 		     }
 		       updateFruits();
-	   }
+	  */ }
      if (keySpace.isDown) {
  		bark();
  	  }
+    else {
+      cake.setVelocityX(0);
+
+      cake.anims.play('turn');
+
+    }
 
     barks.children.each(function (child) {
   		if (Math.abs(child.x) > 1000 || Math.abs(child.y) > 1000) {
