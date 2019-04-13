@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "browser": "^0.2.6"
+    "phaser": "^3.16.2"
   }
 }

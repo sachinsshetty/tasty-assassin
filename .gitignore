@@ -46,8 +46,12 @@ sachin/dont-eat/node_modules/
 sachin/dont-eat/coverage/
 sachin/dont-eat/.nyc_output/
 sachin/dont-eat/package-lock.json
-
+sachin/dont-eat/www/package-lock.json
+sachin/dont-eat/www/node_modules/
+sachin/dont-eat/plugins/
 
 sachin/dont-eat/framework
 sachin/dont-eat/coverage
 sachin/dont-eat/test
+sachin/dont-eat/platforms/browser/www/node_modules/
+sachin/dont-eat/platforms/browser/www/package-lock.json
