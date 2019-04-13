@@ -37,3 +37,7 @@ sources
 * [Python webserver](https://www.linuxjournal.com/content/tech-tip-really-simple-http-server-python)
 
 * [other webserver](https://phaser.io/tutorials/getting-started-phaser3/part2)
+
+credits
+
+bday icon >  https://www.iconfinder.com/icons/378570/birthday_cake_icon
