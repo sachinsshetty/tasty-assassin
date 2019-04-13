@@ -33,10 +33,12 @@ var config = {
 };
 
 
-var player;
 var dogs;
 var barks;
+var barkingSound;
+
 var cursors;
+
 var numberOfCherries = 0;
 var numberOfApples = 0;
 var levelTime = 2*60; // in seconds
@@ -56,8 +58,7 @@ function preload ()
     this.load.image('kitchen', 'assets/kitchen.png');
     this.load.image('ground', 'assets/platform.png');
 
-    this.load.spritesheet('cake', 'assets/cake-sprite.png', { frameWidth: 32, frameHeight: 48 });
-    //this.load.image('cake', 'assets/cake2.png');
+    this.load.spritesheet('cake', 'assets/cake-sprite.png', { frameWidth: 100, frameHeight: 100 });
 
     // Food assets
     this.load.image('apple', 'assets/food/Apple.png');
@@ -69,6 +70,9 @@ function preload ()
 
     this.load.image('dog', 'assets/pets/dog.png');
     this.load.image('barking', 'assets/projectiles/barking.png');
+
+    this.load.audio('barkingSound', 'assets/pets/barking_sound.mp3');
+
 }
 
 function create ()
@@ -98,6 +102,7 @@ function create ()
     dog = dogs.create(100, 536, 'dog');
 
     barks = this.physics.add.group({ allowGravity: false })
+    barkingSound = this.sound.add('barkingSound');
 
 
     //  Player physics properties. Give the little guy a slight bounce.
@@ -149,8 +154,6 @@ function create ()
   //this.physics.add.collider(player, platforms);
   this.physics.add.collider(cake, platforms);
 
-  keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
   //  Collide
   this.physics.add.collider(dogs, platforms);
 
@@ -188,77 +191,46 @@ function bark() {
 	     .setAngle(315)
 	     .setVelocityX(100)
 	     .setVelocityY(-100);
+
+  barkingSound.play();
 	console.log('bark');
-	console.log(barks.children.size);
+
 }
 
 
 function update ()
 {
-	updateTime();
-
     if (gameOver)
     {
         return;
     }
 
-    if (cursors.left.isDown)
-    {
+if (cursors.left.isDown)
+{
+    cake.setVelocityX(-160);
 
-      cake.setVelocityX(-160);
+    cake.anims.play('left', true);
+}
+else if (cursors.right.isDown)
+{
+    cake.setVelocityX(160);
 
-      cake.anims.play('left', true);
+    cake.anims.play('right', true);
+}
+else
+{
+    cake.setVelocityX(0);
 
-/*		    if (numberOfCherries > 0) {
-			       numberOfCherries--;
-		    }
-
-		      updateFruits();
-  */  }
-    else if (cursors.right.isDown)
-    {
-	/*	if (numberOfCherries < 10) {
-			   numberOfCherries++;
-		    }
-		      updateFruits();
-*/
-          cake.setVelocityX(160);
-
-          cake.anims.play('right', true);
-
-    }
-    else if (cursors.up.isDown)
-    {
-	/*	if (numberOfApples < 10) {
-			   numberOfApples++;
-		     }
-		       updateFruits();
-  */  }
-    else if (cursors.down.isDown)
-    {
-	/*	if (numberOfApples > 0) {
-			   numberOfApples--;
-		     }
-		       updateFruits();
-	  */ }
-     if (keySpace.isDown) {
- 		bark();
- 	  }
-    else {
-      cake.setVelocityX(0);
-
-      cake.anims.play('turn');
-
-    }
-
-    barks.children.each(function (child) {
-  		if (Math.abs(child.x) > 1000 || Math.abs(child.y) > 1000) {
-  			child.destroy();
-  		}
-  	});
-
+    cake.anims.play('turn');
 }
 
+if (cursors.up.isDown && cake.body.touching.down)
+{
+    cake.setVelocityY(-330);
+}
+
+
+}
 function onGameOver () {
 	gameOver = true;
 	this.add.text(400, 300, 'Game Over', {font: '20pt Roboto', fill: '#000'});
