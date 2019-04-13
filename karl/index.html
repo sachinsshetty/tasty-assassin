@@ -37,7 +37,7 @@ var cake;
 var platforms;
 var bottoms;
 var dogs;
-var barkingCooldown = 5; // in seconds
+var barkingCooldown = 1; // in seconds
 var sleepingTime = 5; // in seconds
 var barks;
 var barkingSound;
@@ -45,7 +45,8 @@ var barkingSound;
 var cherries = [];
 var apples = [];
 
-var numberOfCherries = 0;
+// numberOfCherries + numberOfApples needs to be less than 20
+var numberOfCherries = 10;
 var numberOfApples = 0;
 var levelTime = 2*60; // in seconds
 var timeText;
@@ -136,7 +137,6 @@ function create ()
 			dog.getData('barkingTimer').paused = false;
 		}
 		}));
-	console.log(dog.getData('barkingTimer'));
 
     barks = this.physics.add.group({ allowGravity: false })
     barkingSound = this.sound.add('barkingSound');
@@ -187,6 +187,8 @@ function create ()
     //  Collide
     this.physics.add.collider(cake, platforms);
     this.physics.add.collider(dogs, bottoms);
+    
+    this.physics.add.overlap(cake, barks, onBarkHit, null, this);
 
 	// The time
 	gameWonEvent = this.time.addEvent({ 
@@ -196,6 +198,10 @@ function create ()
 		});
     timeText = this.add.text(981, 0, '', {font: '20pt Roboto', fill: '#000'}).setOrigin(1, 0);
     updateTime();
+    
+    // gamelost event
+    this.events.on('gamelost', onGameLost, this);
+    
 }
 
 function updateFruits () {
@@ -219,6 +225,16 @@ function updateTime() {
 	                 + ':'
 	                 + Math.floor(timeRemaining % 60).toString().padStart(2, '0'));
 
+}
+
+function updateBarks() {
+	// remove barks that are out of bounds
+	barks.children.each(function (child) {
+		if (Math.abs(child.x) > 1000 || Math.abs(child.y) > 1000) {
+			// the bark is definitely out of bounds
+			child.destroy()
+		}
+	});	
 }
 
 function bark(dog) {
@@ -262,6 +278,16 @@ function update ()
 
 	updateTime();
 	updateFruits();
+	updateBarks();
+}
+
+function onBarkHit(cake, bark) {
+	// the cake was hit by a bark
+	numberOfCherries--;
+	bark.destroy();
+	if (numberOfCherries <= 0) {
+		this.events.emit('gamelost');
+	}
 }
 
 function onGameWon () {
@@ -269,6 +295,13 @@ function onGameWon () {
 	this.time.removeAllEvents();
 	this.add.text(493, 300, 'You won', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
 	gameOver = true;
+}
+
+function onGameLost () {
+	this.physics.pause();
+	this.time.removeAllEvents();
+	this.add.text(493, 300, 'You lost', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
+	gameOver = true;	
 }
 
 </script>
