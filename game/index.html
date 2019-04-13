@@ -37,13 +37,16 @@ var LEVEL_TIME = 1*60; // in seconds
 var BARKING_COOLDOWN = 3; // in seconds
 var BARK_SPEED = 200;
 var SLEEPING_TIME = 5; // in seconds
+var KITTEN_SPEED = 1000;
 
-var cake;
 var platforms;
+var walls;
 var bottoms;
+var cake;
 var dogs;
 var barks;
 var barkingSound;
+var kittens;
 
 var cherries = [];
 var apples = [];
@@ -67,9 +70,10 @@ function preload ()
 	// Background
     this.load.image('kitchen', 'assets/kitchen.png');
     
-    // Platforms
+    // Platforms and boundaries
     this.load.image('ground', 'assets/platform.png');
     this.load.image('bottom', 'assets/bottom.png');
+    this.load.image('wall', 'assets/wall.png');
 
 
 	// Player
@@ -87,6 +91,9 @@ function preload ()
     this.load.image('dog', 'assets/pets/dog.png');
     this.load.image('barking', 'assets/projectiles/barking.png');
     this.load.audio('barkingSound', 'assets/pets/barking_sound.mp3');
+    
+    // Cat assets
+    this.load.spritesheet('cat', 'assets/pets/cat-sprite.png', { frameWidth: 64, frameHeight: 64 });
 
 }
 
@@ -97,16 +104,21 @@ function create ()
 
     //  The platforms group contains the platforms for the cake
     platforms = this.physics.add.staticGroup();
+    //  The walls are the world boundaries on the left and on the right
+    walls = this.physics.add.staticGroup();
     //  The bottoms group contains the floor that cats and dogs can walk on
     bottoms = this.physics.add.staticGroup();
 
 
+    platforms.create(100, 334, 'ground').setVisible(false);
+    platforms.create(500, 334, 'ground').setVisible(false);
+
     //  Here we create the ground.
     bottoms.create(493, 616, 'bottom').setVisible(false);
 
-    //  Now let's create some ledges
-    platforms.create(100, 334, 'ground').setVisible(false);
-    platforms.create(500, 334, 'ground').setVisible(false);
+    //  Here we create walls to the right and to the left of the screen    
+    walls.create(-16, 300, 'wall').setVisible(false);		
+    walls.create(986+16, 300, 'wall').setVisible(false);
 
 
     // The player and its settings
@@ -143,6 +155,11 @@ function create ()
     barks = this.physics.add.group({ allowGravity: false })
     barkingSound = this.sound.add('barkingSound');
 
+
+    kittens = this.physics.add.group({ allowGravity: true });
+    kitty = kittens.create(955, 536, 'cat')
+                   .setVelocityX(KITTEN_SPEED);
+    kitty.setData('velocityX', KITTEN_SPEED);
 
 
     //  Our player animations, turning, walking left and walking right.
@@ -189,6 +206,9 @@ function create ()
     //  Collide
     this.physics.add.collider(cake, platforms);
     this.physics.add.collider(dogs, bottoms);
+    this.physics.add.collider(kittens, bottoms);
+    this.physics.add.collider(kittens, walls, kittyHitWall, null, this);
+    this.physics.add.overlap(kittens, dogs, kittyHitDog, null, this);
     
     this.physics.add.overlap(cake, barks, onBarkHit, null, this);
 
@@ -240,6 +260,7 @@ function updateBarks() {
 }
 
 function bark(dog) {
+	console.log('bark');
 	dogMouth = dog.getCenter().add(new Phaser.Math.Vector2(100, -75));
 	// this is the offset of the cake from the mouth of the dog
 	offset = cake.getCenter().subtract(dogMouth);
@@ -252,7 +273,6 @@ function bark(dog) {
 	     .setVelocityY(velocity.y);
 
     barkingSound.play();
-	console.log('bark');
 }
 
 
@@ -287,6 +307,18 @@ function update ()
 	updateTime();
 	updateFruits();
 	updateBarks();
+}
+
+function kittyHitWall(kitty, wall) {
+	console.log('kittyHitWall');
+	kitty.setData('velocityX', -kitty.getData('velocityX'));
+	kitty.setVelocityX(kitty.getData('velocityX'));
+}
+
+function kittyHitDog(kitty, wall) {
+	console.log('kittyHitDog');
+	kitty.setData('velocityX', -kitty.getData('velocityX'));
+	kitty.setVelocityX(kitty.getData('velocityX'));
 }
 
 function onBarkHit(cake, bark) {
