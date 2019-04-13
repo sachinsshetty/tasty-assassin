@@ -1,6 +1,6 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
+<!doctype html>
+<html lang="en">
+<head>
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 3</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
@@ -38,7 +38,9 @@
 
     function create ()
     {
-        this.add.image(400, 300, 'sky');
+        this.add.image(0, 0, 'sky');
+        this.add.image(0, 0, 'star');
+
     }
 
     function update ()
