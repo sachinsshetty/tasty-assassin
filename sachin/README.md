@@ -22,6 +22,12 @@ https://gamedevacademy.org/creating-mobile-games-with-phaser-3-and-cordova/
 
 
 
+* cordova platform add ios android
+
+* cordova emulate android
+
+* cordova build --release android
+
 
 
 sources
