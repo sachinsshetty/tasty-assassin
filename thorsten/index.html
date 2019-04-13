@@ -45,8 +45,10 @@ var gameOver = false;
 var timeText;
 var platforms;
 var bottoms;
+var walls;
 var cake;
 var kitty;
+var kitty_velocity = -1000;
 
 var cherries = [];
 var apples = [];
@@ -58,6 +60,7 @@ function preload ()
     this.load.image('kitchen', 'assets/kitchen.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('bottom', 'assets/bottom.png');
+    this.load.image('wall', 'assets/wall.png');
     this.load.image('cake', 'assets/cake2.png');
 
     // Food assets
@@ -84,10 +87,15 @@ function create ()
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = this.physics.add.staticGroup();
     bottoms = this.physics.add.staticGroup();
+    walls = this.physics.add.staticGroup();
 
     //  Here we create the ground.
 
     bottoms.create(493, 616, 'bottom');
+
+    // create the left an right walls
+    walls.create(1,300, 'wall').setVisible(true);
+    walls.create(983,300, 'wall').setVisible(true);
 
     //  Now let's create some ledges
     platforms.create(500, 325, 'ground').setVisible(false);
@@ -95,6 +103,10 @@ function create ()
 
     // create the kitty
     kitty = this.physics.add.sprite(955, 536, 'cat');
+    kitty.setVelocity(kitty_velocity, 0);
+    //kitty.setCollideWorldBounds(true);
+    //kitty.onWorldBounds = true;
+    kitty.allowGravity = true;
 
     // The player and its settings
     cake = this.physics.add.image(200, 50, 'cake').setScale(0.75);
@@ -103,6 +115,7 @@ function create ()
     // The dogs - currently only one
     dogs = this.physics.add.group();
     dog = dogs.create(100, 536, 'dog');
+
 
     barks = this.physics.add.group({ allowGravity: false })
 
@@ -163,6 +176,8 @@ function create ()
   //  Collide
   this.physics.add.collider(dogs, bottoms);
   this.physics.add.collider(kitty, bottoms);
+  this.physics.add.overlap(dogs, kitty, kit_hit_dog, null, this);
+  this.physics.add.collider(walls, kitty, kit_hit_wall, null, this);
 
 	// The time
 	gameOverEvent = this.time.addEvent({ delay: levelTime*1000, callback: onGameOver, callbackScope: this });
@@ -183,7 +198,7 @@ function updateFruits () {
 		cherries[i].setVisible(false);
 		apples[i].setVisible(false);
 	}
-}
+}1000
 
 function updateTime() {
 	var timeRemaining = levelTime - gameOverEvent.getElapsedSeconds();
@@ -200,11 +215,12 @@ function bark() {
 	     .setVelocityY(-100);
 	console.log('bark');
 	console.log(barks.children.size);
-}
+}Velo
 
 
 function update ()
 {
+  console.log(kitty.body.velocity.x);
 	updateTime();
 
     if (gameOver)
@@ -251,6 +267,18 @@ function update ()
   		}
   	});
 
+}
+
+function kit_hit_dog () {
+  kitty_velocity *= -1;
+  kitty.setVelocityX(kitty_velocity);
+  console.log("kit_hit_dog");
+}
+
+function kit_hit_wall () {
+  kitty_velocity *= -1;
+  kitty.setVelocityX(kitty_velocity);
+  console.log("kit_hit_wall");
 }
 
 function onGameOver () {
