@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 3</title>
+    <title>Dont Eat (Me)</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -14,38 +14,148 @@
 
 <script type="text/javascript">
 
-    var config = {
-        type: Phaser.AUTO,
-        width: 986,
-        height: 600,
-        scene: {
-            preload: preload,
-            create: create,
-            update: update
+var config = {
+    type: Phaser.AUTO,
+    width: 986,
+    height: 600,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: false
         }
-    };
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
 
-    var game = new Phaser.Game(config);
+var cursors;
+var numberOfCherries = 0;
+var numberOfApples = 0;
+var levelTime = 2*60; // in seconds
+var gameOverEvent;
+var gameOver = false;
+var timeText;
 
-    function preload ()
+var cherries = [];
+var apples = [];
+
+var game = new Phaser.Game(config);
+
+function preload ()
+{
+    this.load.image('sky', 'assets/kitchen.png');
+    this.load.image('ground', 'assets/platform.png');
+    this.load.image('star', 'assets/star.png');
+    this.load.image('bomb', 'assets/bomb.png');
+    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+
+    // Food assets
+    this.load.image('apple', 'assets/food/Apple.png');
+    this.load.image('cherry', 'assets/food/Cherry.png');
+    this.load.image('fish', 'assets/food/Fish.png');
+    this.load.image('peach', 'assets/food/Peach.png');
+    this.load.image('strawberry', 'assets/food/Strawberry.png');
+    this.load.image('tomato', 'assets/food/Tomato.png');
+}
+
+function create ()
+{
+    //  A simple background for our game
+    this.add.image(400, 300, 'sky');
+
+    //  Input Events
+    cursors = this.input.keyboard.createCursorKeys();
+
+    //  The score
+    for (var i = 0; i < 20; i++) {
+		cherries.push(this.add.image(16+24*i, 16, 'cherry'));
+		apples.push(this.add.image(16+24*i, 16, 'apple'));
+	}
+	for (cherry of cherries) {
+		cherry.setVisible(false);
+	}
+	for (apple of apples) {
+		apple.setVisible(false);
+	}
+
+	// The time
+	gameOverEvent = this.time.addEvent({ delay: levelTime*1000, callback: onGameOver, callbackScope: this });
+    timeText = this.add.text(795, 0, '', {font: '20pt Roboto', fill: '#000'}).setOrigin(1, 0);
+    updateTime();
+}
+
+function updateFruits () {
+	for (var i = 0; i < numberOfCherries; i++) {
+		cherries[i].setVisible(true);
+		apples[i].setVisible(false);
+	}
+	for (var i = numberOfCherries; i < numberOfCherries+numberOfApples; i++) {
+		cherries[i].setVisible(false);
+		apples[i].setVisible(true);
+	}
+	for (var i = numberOfCherries+numberOfApples; i < 20; i++) {
+		cherries[i].setVisible(false);
+		apples[i].setVisible(false);
+	}
+}
+
+function updateTime() {
+	var timeRemaining = levelTime - gameOverEvent.getElapsedSeconds();
+	timeText.setText(Math.floor(timeRemaining/60).toString().padStart(2, '0')
+	                 + ':'
+	                 + Math.floor(timeRemaining % 60).toString().padStart(2, '0'));
+
+}
+
+function update ()
+{
+	updateTime();
+
+    if (gameOver)
     {
-        this.load.image('kitchen', 'assets/kitchen.png');
-        this.load.image('ground', 'assets/platform.png');
-        this.load.image('star', 'assets/star.png');
-        this.load.image('bomb', 'assets/bomb.png');
-        this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+        return;
     }
 
-    function create ()
+    if (cursors.left.isDown)
     {
-        this.add.image(493, 300, 'kitchen');
-        //this.add.image(400, 568, 'star');
+		if (numberOfCherries > 0) {
+			numberOfCherries--;
+		}
 
+		updateFruits();
     }
-
-    function update ()
+    else if (cursors.right.isDown)
     {
+		if (numberOfCherries < 10) {
+			numberOfCherries++;
+		}
+		updateFruits();
     }
+    else if (cursors.up.isDown)
+    {
+		if (numberOfApples < 10) {
+			numberOfApples++;
+		}
+		updateFruits();
+    }
+    else if (cursors.down.isDown)
+    {
+		if (numberOfApples > 0) {
+			numberOfApples--;
+		}
+		updateFruits();
+	}
+
+}
+
+function onGameOver () {
+	gameOver = true;
+	this.add.text(400, 300, 'Game Over', {font: '20pt Roboto', fill: '#000'});
+}
 
 </script>
 
