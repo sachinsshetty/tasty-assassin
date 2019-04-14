@@ -43,6 +43,7 @@ var app = {
 
 
     var LEVEL_TIME = 1*60; // in seconds
+    var THROW_SPEED = 300;
     var BARKING_COOLDOWN = 3; // in seconds
     var BARK_SPEED = 200;
     var SLEEPING_TIME = 5; // in seconds
@@ -238,9 +239,16 @@ var app = {
 
     function onPointerDown() {
     	console.log('onPointerDown');
-    	appleProjectiles.create(cake.x, cake.y, 'apple')
-    	                .setVelocityX(cake.body.velocity.x)
-    	                .setVelocityY(cake.body.velocity.y);
+    	cakePosition = cake.getCenter();
+		cakeVelocity = new Phaser.Math.Vector2().copy(cake.body.velocity);
+		mousePosition = new Phaser.Math.Vector2(this.input.localX,
+												this.input.localY);
+		throwDirection = mousePosition.subtract(cakePosition).normalize();
+		appleVelocity = cakeVelocity.add(throwDirection.scale(THROW_SPEED));
+		
+		appleProjectiles.create(cake.x, cake.y, 'apple')
+						.setVelocityX(appleVelocity.x)
+						.setVelocityY(appleVelocity.y); 
     }
 
     function onAppleHitDog(appleProjectile, dog) {
