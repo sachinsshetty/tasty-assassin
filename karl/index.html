@@ -43,37 +43,63 @@ function create ()
     //  A simple background for our game
     this.add.image(493, 300, 'kitchen');  
     
-    textConfig =  {font: '40pt Roboto', fill: '#000'}
+    textConfig =  {font: '20pt Roboto', fill: '#000'}
 
-    startButton = this.add.image(493, 300, 'button')
-                          .setScale(2)
-                          .setInteractive();
-    pressedStartButton = this.add.image(493, 300, 'buttonPressed')
-                                 .setScale(2)
-                                 .setVisible(false);
-    this.add.text(493, 292, 'Start game', textConfig)
+    startButton = this.add.image(493, 240, 'button')
+                          .setInteractive()
+                          .setData('isPressed', false);
+    this.add.text(493, 235, 'Start game', textConfig)
 	        .setOrigin(0.5, 0.5);
              
 	startButton.on('pointerdown', function () {
-		startButton.setVisible(false);
-		pressedStartButton.setVisible(true);
-		location.href = 'level1.html';
+		startButton.setData('isPressed', true);
+		startButton.setTexture('buttonPressed');
 	});
 
-    creditsButton = this.add.image(493, 450, 'button')
-                            .setScale(2)
-                            .setInteractive();
-    pressedCreditsButton = this.add.image(493, 300, 'buttonPressed')
-                                   .setScale(2)
-                                   .setVisible(false);
-    this.add.text(493, 442, 'Credits', textConfig)
+	startButton.on('pointerout', function () {
+		startButton.setTexture('button');
+	});
+
+	startButton.on('pointerover', function () {
+		if (startButton.getData('isPressed')) {
+			startButton.setTexture('buttonPressed');
+		}
+	});
+
+    creditsButton = this.add.image(493, 300, 'button')
+                            .setInteractive()
+                            .setData('isPressed', false);
+    this.add.text(493, 295, 'Credits', textConfig)
 		    .setOrigin(0.5, 0.5); 
 
 	creditsButton.on('pointerdown', function () {
-		creditsButton.setVisible(false);
-		pressedCreditsButton.setVisible(true);
-		location.href = 'credits.html';
+		creditsButton.setData('isPressed', true);
+		creditsButton.setTexture('buttonPressed');
 	});
+
+	creditsButton.on('pointerout', function () {
+		creditsButton.setTexture('button');
+	});
+
+	creditsButton.on('pointerover', function () {
+		if (creditsButton.getData('isPressed')) {
+			creditsButton.setTexture('buttonPressed');
+		}
+	});
+	
+	this.input.on('pointerup', function () {
+		if (startButton.getData('isPressed')) {
+			startButton.setData('isPressed', false);
+			startButton.setTexture('button');
+			location.href = 'level1.html';
+		}
+		if (creditsButton.getData('isPressed')) {
+			creditsButton.setData('isPressed', false);
+			creditsButton.setTexture('button');
+			location.href = 'credits.html';
+		}
+	})
+	
 }
 
 function update ()
