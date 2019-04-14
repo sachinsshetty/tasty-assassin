@@ -1,11 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="io.cordova.hellocordova" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>HelloCordova</name>
+    <name>Dont Eat (Me)</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        Game developed for Tasty Assassin Theme : April 2019
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="info@slabs.tech" href="https://slabs.tech">
     </author>
     <content src="index.html" />
     <access origin="*" />

@@ -1,11 +1,10 @@
 {
   "background_color": "#FFF",
   "display": "standalone",
-  "name": "HelloCordova",
-  "short_name": "HelloCordova",
+  "name": "Dont Eat (Me)",
+  "short_name": "Dont Eat (Me)",
   "version": "io.cordova.hellocordova",
-  "description": "A sample Apache Cordova application that responds to the deviceready event.",
-  "author": "Apache Cordova Team",
+  "description": "Game developed for Tasty Assassin Theme : April 2019",
   "icons": [],
   "start_url": "index.html"
 }
