@@ -48,6 +48,9 @@ var app = {
     var SLEEPING_TIME = 5; // in seconds
     var KITTEN_SPEED = 1000;
 
+    var background;
+    var appleProjectiles;
+
     var platforms;
     var walls;
     var bottoms;
@@ -213,23 +216,55 @@ var app = {
     }
 
     function onGameWon () {
-    	this.physics.pause();
-    	this.time.removeAllEvents();
+      stopGame(this);
+
     	this.add.text(493, 300, 'You won', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
-    	gameOver = true;
     }
 
     function onGameLost () {
-    	this.physics.pause();
-    	this.time.removeAllEvents();
+      stopGame(this);
+
     	this.add.text(493, 300, 'You lost', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
+
+    }
+
+    function stopGame(scene) {
+    	scene.physics.pause();
+    	scene.time.removeAllEvents();
+    	background.off('pointerdown');
     	gameOver = true;
     }
+
+
+    function onPointerDown() {
+    	console.log('onPointerDown');
+    	appleProjectiles.create(cake.x, cake.y, 'apple')
+    	                .setVelocityX(cake.body.velocity.x)
+    	                .setVelocityY(cake.body.velocity.y);
+    }
+
+    function onAppleHitDog(appleProjectile, dog) {
+    	// an apple hit a dog
+    	appleProjectile.destroy();
+    	dog.getData('barkingTimer').paused = true;
+    	dog.getData('sleepingTimer').paused = false;
+    }
+
+    function onAppleHitKitten(appleProjectile, kitten) {
+    	// an apple hit a kitten
+    	appleProjectile.destroy();
+    }
+
+
 
     function create() {
 
       //  A simple background for our game
-      this.add.image(493, 300, 'kitchen');
+      background = this.add.image(493, 300, 'kitchen').setInteractive();
+      //  Register a click anywhere on the screen
+
+      background.on('pointerdown', onPointerDown);
+
 
       //  The platforms group contains the platforms for the cake
       platforms = this.physics.add.staticGroup();
@@ -255,6 +290,8 @@ var app = {
       //  Player physics properties. Give the little guy no bounce.
       cake.setBounce(0);
       cake.setCollideWorldBounds(true);
+
+      appleProjectiles = this.physics.add.group({ collideWorldBounds: true });
 
       // The dogs - currently only one
       dogs = this.physics.add.group();
@@ -334,10 +371,18 @@ var app = {
 
       //  Collide
       this.physics.add.collider(cake, platforms);
+      this.physics.add.collider(appleProjectiles, bottoms);
+      this.physics.add.collider(appleProjectiles, walls);
+      this.physics.add.collider(appleProjectiles, appleProjectiles);
+
       this.physics.add.collider(dogs, bottoms);
       this.physics.add.collider(kittens, bottoms);
       this.physics.add.collider(kittens, walls, kittyHitWall, null, this);
       this.physics.add.overlap(kittens, dogs, kittyHitDog, null, this);
+
+      this.physics.add.overlap(appleProjectiles, dogs, onAppleHitDog, null, this);
+      this.physics.add.overlap(appleProjectiles, kittens, onAppleHitKitten, null, this);
+
 
       this.physics.add.overlap(cake, barks, onBarkHit, null, this);
 
