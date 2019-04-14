@@ -67,7 +67,7 @@ var gameOver = false;
 
 var cursors;
 var keySpace;
-
+3020e401a703a8bd4f36312b927026d1ba07135f
 
 var game = new Phaser.Game(config);
 
@@ -386,6 +386,8 @@ function kittyHitDog(kitty, wall) {
 	miauSound.play();
 	kitty.setData('velocityX', -kitty.getData('velocityX'));
 	kitty.setVelocityX(kitty.getData('velocityX'));
+  kitty.setVelocityY(-300);
+  catDirection(kitty);
 }
 
 function onAppleHitDog(appleProjectile, dog) {
