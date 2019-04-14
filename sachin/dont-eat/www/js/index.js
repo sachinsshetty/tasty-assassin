@@ -245,10 +245,10 @@ var app = {
 												this.input.localY);
 		throwDirection = mousePosition.subtract(cakePosition).normalize();
 		appleVelocity = cakeVelocity.add(throwDirection.scale(THROW_SPEED));
-		
+
 		appleProjectiles.create(cake.x, cake.y, 'apple')
 						.setVelocityX(appleVelocity.x)
-						.setVelocityY(appleVelocity.y); 
+						.setVelocityY(appleVelocity.y);
     }
 
     function onAppleHitDog(appleProjectile, dog) {
@@ -291,6 +291,10 @@ var app = {
       //  Here we create walls to the right and to the left of the screen
       walls.create(-16, 300, 'wall').setVisible(false);
       walls.create(986+16, 300, 'wall').setVisible(false);
+
+      //  The fridge_wall contains the wall blocking the cake from falling down
+      fridge_wall = this.physics.add.staticGroup();
+      fridge_wall.create(765, 300, 'wall').setVisible(false);
 
 
       // The player and its settings
@@ -379,6 +383,7 @@ var app = {
 
       //  Collide
       this.physics.add.collider(cake, platforms);
+      this.physics.add.collider(cake, fridge_wall);
       this.physics.add.collider(appleProjectiles, bottoms);
       this.physics.add.collider(appleProjectiles, walls);
       this.physics.add.collider(appleProjectiles, appleProjectiles);
