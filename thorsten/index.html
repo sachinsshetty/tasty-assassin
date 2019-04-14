@@ -207,6 +207,7 @@ function create ()
     kitty.setData('velocityX', -KITTEN_SPEED);
     kitty.setData('wallHits', 0);
     kitty.setData('wallHitsJump', 3);
+    kitty.setData('hungry', 1);
     kitty.anims.play('leftCatWalk', true);
 
     /*
@@ -360,9 +361,6 @@ function kittyHitWall(kitty, wall) {
   }
   var hits = kitty.getData('wallHits');
   kitty.setData('wallHits', (hits+1));
-  console.log('hits: ' + hits);
-  console.log('wallHitsJump: ' + kitty.getData('wallHitsJump'))
-
 }
 
 function kittyHitDog(kitty, wall) {
@@ -385,7 +383,10 @@ function onBarkHit(cake, bark) {
 }
 
 function onkittensHit(cake, kitty) {
-  numberOfCherries--;
+  if( kitty.getData('hungry') == 1 ) {
+      numberOfCherries--;
+  }
+  kitty.setData('hungry', 0);
 }
 
 function onGameWon () {
@@ -409,6 +410,7 @@ function catDirection(kitty) {
   } else {
     kitty.anims.play('rightCatWalk', true);
   }
+  kitty.setData('hungry', 1);
 }
 
 function catJump() {
@@ -416,6 +418,7 @@ function catJump() {
   if (dice == 1 && kitty.y > 550) {
     crazyCat1Sound.play();
     kitty.setVelocityY(-600);
+    kitty.setData('hungry', 1);
   }
 }
 
