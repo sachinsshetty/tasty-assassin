@@ -35,6 +35,7 @@ var config = {
 
 var LEVEL_TIME = 1*60; // in seconds
 var THROW_SPEED = 300;
+var FRIDGE_COOLDOWN = 5; // in seconds
 var BARKING_COOLDOWN = 3; // in seconds
 var BARK_SPEED = 200;
 var SLEEPING_TIME = 5; // in seconds
@@ -42,6 +43,7 @@ var KITTEN_SPEED = 1000;
 
 var background;
 var platforms;
+var fridge;
 var walls;
 var bottoms;
 var cake;
@@ -58,6 +60,7 @@ var apples = [];
 var numberOfCherries = 10;
 var numberOfApples = 0;
 var timeText;
+var numberOfApplesInFridge = 0;
 
 var gameWonEvent;
 var gameOver = false;
@@ -125,6 +128,22 @@ function create ()
     walls.create(-16, 300, 'wall').setVisible(false);		
     walls.create(986+16, 300, 'wall').setVisible(false);
 
+    fridgeWalls = this.physics.add.staticGroup();
+    fridge = fridgeWalls.create(765, 300, 'wall').setVisible(false);
+    // The apple image at the fridge
+    fridge.setData('apples', [this.add.image(800, 280, 'apple'),
+                              this.add.image(824, 280, 'apple'),
+                              this.add.image(848, 280, 'apple')]);
+    fridge.setData('appleTimer', this.time.addEvent({
+		delay: FRIDGE_COOLDOWN*1000,
+		callbackScope: this,
+		loop: true,
+		callback: function () {
+			if (numberOfApplesInFridge < 3) {
+				numberOfApplesInFridge++;
+			}
+	    },
+		}));
 
     // The player and its settings
     cake = this.physics.add.sprite(200, 50, 'cake');
@@ -209,9 +228,9 @@ function create ()
 		apple.setVisible(false);
 	}
 
-
     //  Collide
     this.physics.add.collider(cake, platforms);
+    this.physics.add.collider(cake, fridgeWalls, cakeHitFridge, null, this);
     this.physics.add.collider(appleProjectiles, bottoms);
     this.physics.add.collider(appleProjectiles, walls);
     this.physics.add.collider(appleProjectiles, appleProjectiles);
@@ -251,6 +270,11 @@ function updateFruits () {
 		cherries[i].setVisible(false);
 		apples[i].setVisible(false);
 	}
+	
+	for (var i = 0; i < fridge.getData('apples').length; i++) {
+		fridge.getData('apples')[i].setVisible(i < numberOfApplesInFridge);
+	}
+	
 }
 
 function updateTime() {
@@ -324,16 +348,31 @@ function update ()
 function onPointerDown() {
 	console.log('onPointerDown');
 
-	cakePosition = cake.getCenter();
-	cakeVelocity = new Phaser.Math.Vector2().copy(cake.body.velocity);
-	mousePosition = new Phaser.Math.Vector2(this.input.localX,
-	                                         this.input.localY);
-	throwDirection = mousePosition.subtract(cakePosition).normalize();
-	appleVelocity = cakeVelocity.add(throwDirection.scale(THROW_SPEED));
-	
-	appleProjectiles.create(cake.x, cake.y, 'apple')
-	                .setVelocityX(appleVelocity.x)
-	                .setVelocityY(appleVelocity.y); 
+    if (numberOfApples > 0) {
+		cakePosition = cake.getCenter();
+		cakeVelocity = new Phaser.Math.Vector2().copy(cake.body.velocity);
+		mousePosition = new Phaser.Math.Vector2(this.input.localX,
+												this.input.localY);
+		throwDirection = mousePosition.subtract(cakePosition).normalize();
+		appleVelocity = cakeVelocity.add(throwDirection.scale(THROW_SPEED));
+		
+		appleProjectiles.create(cake.x, cake.y, 'apple')
+						.setVelocityX(appleVelocity.x)
+						.setVelocityY(appleVelocity.y); 
+		numberOfApples--;
+	}		
+}
+
+function cakeHitFridge(cake, fridge) {
+	console.log('cakeHitFridge', this.time.now, fridge.getData('apples'));
+	emptyAppleSlots = 10-numberOfApples;
+	if (emptyAppleSlots < numberOfApplesInFridge) {
+		numberOfApplesInFridge -= emptyAppleSlots;
+		numberOfApples += emptyAppleSlots;
+	} else {
+		numberOfApples += numberOfApplesInFridge;
+		numberOfApplesInFridge = 0;
+	}
 }
 
 function kittyHitWall(kitty, wall) {
