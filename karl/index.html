@@ -52,7 +52,7 @@ function create ()
     startButton = this.add.image(493, 240, 'button')
                           .setInteractive()
                           .setData('isPressed', false);
-    this.add.text(493, 235, 'Start game', textConfig)
+    this.add.text(493, 235, 'Easy', textConfig)
 	        .setOrigin(0.5, 0.5);
              
 	startButton.on('pointerdown', function () {
@@ -70,10 +70,31 @@ function create ()
 		}
 	});
 
-    creditsButton = this.add.image(493, 300, 'button')
+    startButton2 = this.add.image(493, 300, 'button')
+                          .setInteractive()
+                          .setData('isPressed', false);
+    this.add.text(493, 295, 'Hard', textConfig)
+	        .setOrigin(0.5, 0.5);
+             
+	startButton2.on('pointerdown', function () {
+		startButton2.setData('isPressed', true);
+		startButton2.setTexture('buttonPressed');
+	});
+
+	startButton2.on('pointerout', function () {
+		startButton2.setTexture('button');
+	});
+
+	startButton2.on('pointerover', function () {
+		if (startButton2.getData('isPressed')) {
+			startButton2.setTexture('buttonPressed');
+		}
+	});
+
+    creditsButton = this.add.image(493, 360, 'button')
                             .setInteractive()
                             .setData('isPressed', false);
-    this.add.text(493, 295, 'Credits', textConfig)
+    this.add.text(493, 355, 'Credits', textConfig)
 		    .setOrigin(0.5, 0.5); 
 
 	creditsButton.on('pointerdown', function () {
@@ -96,6 +117,11 @@ function create ()
 			startButton.setData('isPressed', false);
 			startButton.setTexture('button');
 			location.href = 'level1.html';
+		}
+		if (startButton2.getData('isPressed')) {
+			startButton2.setData('isPressed', false);
+			startButton2.setTexture('button');
+			location.href = 'level2.html';
 		}
 		if (creditsButton.getData('isPressed')) {
 			creditsButton.setData('isPressed', false);
