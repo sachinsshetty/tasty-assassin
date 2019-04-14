@@ -21,7 +21,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
+            gravity: { y: 500 },
             debug: false
         }
     },
@@ -35,11 +35,11 @@ var config = {
 
 var LEVEL_TIME = 1*60; // in seconds
 var THROW_SPEED = 300;
-var FRIDGE_COOLDOWN = 5; // in seconds
+var FRIDGE_COOLDOWN = 5;
 var BARKING_COOLDOWN = 3; // in seconds
 var BARK_SPEED = 200;
 var SLEEPING_TIME = 5; // in seconds
-var KITTEN_SPEED = 1000;
+var KITTEN_SPEED = 300;
 
 var background;
 var platforms;
@@ -52,6 +52,9 @@ var dogs;
 var barks;
 var barkingSound;
 var kittens;
+var miauSound;
+var crazyCat1Sound;
+var crazyCat2Sound;
 
 var cherries = [];
 var apples = [];
@@ -68,14 +71,13 @@ var gameOver = false;
 var cursors;
 var keySpace;
 
-
 var game = new Phaser.Game(config);
 
 function preload ()
 {
 	// Background
     this.load.image('kitchen', 'assets/kitchen.png');
-    
+
     // Platforms and boundaries
     this.load.image('ground', 'assets/platform.png');
     this.load.image('bottom', 'assets/bottom.png');
@@ -97,7 +99,10 @@ function preload ()
     this.load.image('dog', 'assets/pets/dog.png');
     this.load.image('barking', 'assets/projectiles/barking.png');
     this.load.audio('barkingSound', 'assets/pets/barking_sound.mp3');
-    
+    this.load.audio('miauSound', 'assets/pets/miau_sound.wav');
+    this.load.audio('crazyCat1Sound', 'assets/pets/crazyCat1_sound.wav');
+    this.load.audio('crazyCat2Sound', 'assets/pets/crazyCat2_sound.wav');
+
     // Cat assets
     this.load.spritesheet('cat', 'assets/pets/cat-sprite.png', { frameWidth: 64, frameHeight: 64 });
 
@@ -105,6 +110,42 @@ function preload ()
 
 function create ()
 {
+	//  Our player animations, turning, walking left and walking right.
+	this.anims.create({
+		key: 'left',
+		frames: this.anims.generateFrameNumbers('cake', { start: 0, end: 3 }),
+		frameRate: 10,
+		repeat: -1
+	});
+
+	this.anims.create({
+		key: 'turn',
+		frames: [ { key: 'cake', frame: 4 } ],
+		frameRate: 20
+	});
+
+	this.anims.create({
+		key: 'right',
+		frames: this.anims.generateFrameNumbers('cake', { start: 5, end: 8 }),
+		frameRate: 10,
+		repeat: -1
+	});
+
+	  // animations for kittens
+	this.anims.create({
+		key: 'leftCatWalk',
+		frames: this.anims.generateFrameNumbers('cat', { start: 0, end: 5 }),
+		frameRate: 10,
+		repeat: -1
+	});
+
+	this.anims.create({
+		key: 'rightCatWalk',
+		frames: this.anims.generateFrameNumbers('cat', { start: 7, end: 12 }),
+		frameRate: 10,
+		repeat: -1
+	});
+
     //  A simple background for our game
     background = this.add.image(493, 300, 'kitchen').setInteractive();
     //  Register a click anywhere on the screen
@@ -116,21 +157,10 @@ function create ()
     walls = this.physics.add.staticGroup();
     //  The bottoms group contains the floor that cats and dogs can walk on
     bottoms = this.physics.add.staticGroup();
-
-
-    platforms.create(100, 334, 'ground').setVisible(false);
-    platforms.create(500, 334, 'ground').setVisible(false);
-
-    //  Here we create the ground.
-    bottoms.create(493, 616, 'bottom').setVisible(false);
-
-    //  Here we create walls to the right and to the left of the screen    
-    walls.create(-16, 300, 'wall').setVisible(false);		
-    walls.create(986+16, 300, 'wall').setVisible(false);
-
+    
     fridgeWalls = this.physics.add.staticGroup();
     fridge = fridgeWalls.create(765, 300, 'wall').setVisible(false);
-    // The apple image at the fridge
+    // The apple images at the fridge
     fridge.setData('apples', [this.add.image(800, 280, 'apple'),
                               this.add.image(824, 280, 'apple'),
                               this.add.image(848, 280, 'apple')]);
@@ -145,12 +175,24 @@ function create ()
 	    },
 		}));
 
+
+    platforms.create(100, 334, 'ground').setVisible(false);
+    platforms.create(500, 334, 'ground').setVisible(false);
+
+    //  Here we create the ground.
+    bottoms.create(493, 616, 'bottom').setVisible(false);
+
+    //  Here we create walls to the right and to the left of the screen
+    walls.create(-16, 300, 'wall').setVisible(false);
+    walls.create(986+16, 300, 'wall').setVisible(false);
+
+
     // The player and its settings
     cake = this.physics.add.sprite(200, 50, 'cake');
     //  Player physics properties. Give the little guy no bounce.
     cake.setBounce(0);
     cake.setCollideWorldBounds(true);
-    
+
     appleProjectiles = this.physics.add.group({ collideWorldBounds: true });
 
     // The dogs - currently only one
@@ -164,8 +206,8 @@ function create ()
 			bark(dog);
 	    },
 		}));
-  
-  
+
+
     dog.setData('sleepingTimer', this.time.addEvent({
 		delay: SLEEPING_TIME*1000,
 		callbackScope: this,
@@ -180,35 +222,20 @@ function create ()
 
     barks = this.physics.add.group({ allowGravity: false })
     barkingSound = this.sound.add('barkingSound');
+    miauSound = this.sound.add('miauSound');
+    crazyCat1Sound = this.sound.add('crazyCat1Sound');
+    crazyCat2Sound = this.sound.add('crazyCat2Sound');
 
-
+	// The kittens - also just one
     kittens = this.physics.add.group({ allowGravity: true });
     kitty = kittens.create(955, 536, 'cat')
-                   .setVelocityX(KITTEN_SPEED);
-    kitty.setData('velocityX', KITTEN_SPEED);
-
-
-    //  Our player animations, turning, walking left and walking right.
-    this.anims.create({
-        key: 'left',
-        frames: this.anims.generateFrameNumbers('cake', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: 'turn',
-        frames: [ { key: 'cake', frame: 4 } ],
-        frameRate: 20
-    });
-
-    this.anims.create({
-        key: 'right',
-        frames: this.anims.generateFrameNumbers('cake', { start: 5, end: 8 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
+                   .setVelocityX(-KITTEN_SPEED);
+    kitty.setData('velocityX', -KITTEN_SPEED);
+    kitty.setData('wallHits', 0);
+    kitty.setData('wallHitsJump', 3);
+    kitty.setData('hungry', true);
+    kitty.anims.play('leftCatWalk', true);
+    
 
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
@@ -228,6 +255,7 @@ function create ()
 		apple.setVisible(false);
 	}
 
+
     //  Collide
     this.physics.add.collider(cake, platforms);
     this.physics.add.collider(cake, fridgeWalls, cakeHitFridge, null, this);
@@ -238,26 +266,32 @@ function create ()
     this.physics.add.collider(kittens, bottoms);
     this.physics.add.collider(kittens, walls, kittyHitWall, null, this);
     this.physics.add.overlap(kittens, dogs, kittyHitDog, null, this);
-    
+
     this.physics.add.overlap(appleProjectiles, dogs, onAppleHitDog, null, this);
     this.physics.add.overlap(appleProjectiles, kittens, onAppleHitKitten, null, this);
     this.physics.add.overlap(cake, barks, onBarkHit, null, this);
+    this.physics.add.overlap(cake, kittens, onkittensHit, null, this);
 
 	// The time
-	gameWonEvent = this.time.addEvent({ 
-		delay: LEVEL_TIME*1000, 
-		callback: onGameWon, 
-		callbackScope: this 
+	gameWonEvent = this.time.addEvent({
+		delay: LEVEL_TIME*1000,
+		callback: onGameWon,
+		callbackScope: this
 		});
     timeText = this.add.text(981, 0, '', {font: '20pt Roboto', fill: '#000'}).setOrigin(1, 0);
     updateTime();
-    
+
     // gamelost event
     this.events.on('gamelost', onGameLost, this);
-    
+
 }
 
-function updateFruits () {
+function updateFruits (scene) {
+
+    if (numberOfCherries <= 0) {
+		numberOfCherries = 0;
+	}
+
 	for (var i = 0; i < numberOfCherries; i++) {
 		cherries[i].setVisible(true);
 		apples[i].setVisible(false);
@@ -270,11 +304,15 @@ function updateFruits () {
 		cherries[i].setVisible(false);
 		apples[i].setVisible(false);
 	}
+
+    if (numberOfCherries <= 0) {
+		scene.events.emit('gamelost');
+	}
+	
 	
 	for (var i = 0; i < fridge.getData('apples').length; i++) {
 		fridge.getData('apples')[i].setVisible(i < numberOfApplesInFridge);
 	}
-	
 }
 
 function updateTime() {
@@ -292,7 +330,7 @@ function updateBarks() {
 			// the bark is definitely out of bounds
 			child.destroy()
 		}
-	});	
+	});
 }
 
 function bark(dog) {
@@ -302,7 +340,7 @@ function bark(dog) {
 	offset = cake.getCenter().subtract(dogMouth);
 	rotation = offset.angle();
 	velocity = offset.normalize().scale(BARK_SPEED);
-	
+
 	barks.create(dogMouth.x, dogMouth.y, 'barking')
 	     .setRotation(rotation)
 	     .setVelocityX(velocity.x)
@@ -314,6 +352,8 @@ function bark(dog) {
 
 function update ()
 {
+    catJump();
+    
     if (gameOver)
     {
         return;
@@ -341,26 +381,26 @@ function update ()
 	}
 
 	updateTime();
-	updateFruits();
+	updateFruits(this);
 	updateBarks();
 }
 
 function onPointerDown() {
 	console.log('onPointerDown');
 
-    if (numberOfApples > 0) {
+	if (numberOfApples > 0) {
 		cakePosition = cake.getCenter();
 		cakeVelocity = new Phaser.Math.Vector2().copy(cake.body.velocity);
 		mousePosition = new Phaser.Math.Vector2(this.input.localX,
-												this.input.localY);
+												 this.input.localY);
 		throwDirection = mousePosition.subtract(cakePosition).normalize();
 		appleVelocity = cakeVelocity.add(throwDirection.scale(THROW_SPEED));
-		
+
 		appleProjectiles.create(cake.x, cake.y, 'apple')
 						.setVelocityX(appleVelocity.x)
-						.setVelocityY(appleVelocity.y); 
+						.setVelocityY(appleVelocity.y);		
 		numberOfApples--;
-	}		
+	}
 }
 
 function cakeHitFridge(cake, fridge) {
@@ -379,12 +419,45 @@ function kittyHitWall(kitty, wall) {
 	console.log('kittyHitWall');
 	kitty.setData('velocityX', -kitty.getData('velocityX'));
 	kitty.setVelocityX(kitty.getData('velocityX'));
+	
+    catDirection(kitty);
+    
+    if (kitty.y > 300 && kitty.getData('wallHits') >= kitty.getData('wallHitsJump')) {
+		crazyCat2Sound.play();
+		kitty.setVelocityY(-200);
+		kitty.setData('wallHitsJump', Phaser.Math.Between(1, 5));
+		kitty.setData('wallHits', 0);
+    }
+    
+    var hits = kitty.getData('wallHits');
+    kitty.setData('wallHits', hits+1);
 }
 
 function kittyHitDog(kitty, wall) {
-	console.log('kittyHitDog');
+	miauSound.play();
 	kitty.setData('velocityX', -kitty.getData('velocityX'));
 	kitty.setVelocityX(kitty.getData('velocityX'));
+    kitty.setVelocityY(-300);
+    catDirection(kitty);
+}
+
+function catDirection(kitty) {
+    var velocity = kitty.getData('velocityX');
+    if (velocity < 0) {
+        kitty.anims.play('leftCatWalk', true);
+    } else {
+        kitty.anims.play('rightCatWalk', true);
+    }
+    kitty.setData('hungry', true);
+}
+
+function catJump() {
+    var dice = Phaser.Math.Between(1, 70);
+    if (dice == 1 && kitty.y > 550) {
+        crazyCat1Sound.play();
+        kitty.setVelocityY(-600);
+        kitty.setData('hungry', 1);
+    }
 }
 
 function onAppleHitDog(appleProjectile, dog) {
@@ -394,21 +467,23 @@ function onAppleHitDog(appleProjectile, dog) {
 	dog.getData('sleepingTimer').paused = false;
 }
 
+function onkittensHit(cake, kitty) {
+    if(kitty.getData('hungry')) {
+        numberOfCherries--;
+    }
+    kitty.setData('hungry', false);
+}
+
 function onAppleHitKitten(appleProjectile, kitten) {
 	// an apple hit a kitten
 	appleProjectile.destroy();
+	kitty.setData('hungry', false);
 }
-
 
 function onBarkHit(cake, bark) {
 	// the cake was hit by a bark
-	numberOfCherries--;
 	bark.destroy();
-	if (numberOfCherries <= 0) {
-		numberOfCherries = 0;
-		updateFruits();
-		this.events.emit('gamelost');
-	}
+	numberOfCherries--;
 }
 
 function onGameWon () {
@@ -425,8 +500,9 @@ function stopGame(scene) {
 	scene.physics.pause();
 	scene.time.removeAllEvents();
 	background.off('pointerdown');
-	gameOver = true;	
+	gameOver = true;
 }
+
 
 </script>
 
