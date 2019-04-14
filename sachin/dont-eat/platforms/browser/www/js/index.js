@@ -23,8 +23,8 @@ var app = {
     var config = {
         type: Phaser.WEBGL,
         parent: 'game',
-        //width: 986,
-        //height: 600,
+        width: 986,
+        height: 600,
         physics: {
             default: 'arcade',
             arcade: {
@@ -43,10 +43,14 @@ var app = {
 
 
     var LEVEL_TIME = 1*60; // in seconds
+    var THROW_SPEED = 300;
     var BARKING_COOLDOWN = 3; // in seconds
     var BARK_SPEED = 200;
     var SLEEPING_TIME = 5; // in seconds
     var KITTEN_SPEED = 1000;
+
+    var background;
+    var appleProjectiles;
 
     var platforms;
     var walls;
@@ -213,23 +217,62 @@ var app = {
     }
 
     function onGameWon () {
-    	this.physics.pause();
-    	this.time.removeAllEvents();
+      stopGame(this);
+
     	this.add.text(493, 300, 'You won', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
-    	gameOver = true;
     }
 
     function onGameLost () {
-    	this.physics.pause();
-    	this.time.removeAllEvents();
+      stopGame(this);
+
     	this.add.text(493, 300, 'You lost', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
+
+    }
+
+    function stopGame(scene) {
+    	scene.physics.pause();
+    	scene.time.removeAllEvents();
+    	background.off('pointerdown');
     	gameOver = true;
     }
+
+
+    function onPointerDown() {
+    	console.log('onPointerDown');
+    	cakePosition = cake.getCenter();
+		cakeVelocity = new Phaser.Math.Vector2().copy(cake.body.velocity);
+		mousePosition = new Phaser.Math.Vector2(this.input.localX,
+												this.input.localY);
+		throwDirection = mousePosition.subtract(cakePosition).normalize();
+		appleVelocity = cakeVelocity.add(throwDirection.scale(THROW_SPEED));
+
+		appleProjectiles.create(cake.x, cake.y, 'apple')
+						.setVelocityX(appleVelocity.x)
+						.setVelocityY(appleVelocity.y);
+    }
+
+    function onAppleHitDog(appleProjectile, dog) {
+    	// an apple hit a dog
+    	appleProjectile.destroy();
+    	dog.getData('barkingTimer').paused = true;
+    	dog.getData('sleepingTimer').paused = false;
+    }
+
+    function onAppleHitKitten(appleProjectile, kitten) {
+    	// an apple hit a kitten
+    	appleProjectile.destroy();
+    }
+
+
 
     function create() {
 
       //  A simple background for our game
-      this.add.image(493, 300, 'kitchen');
+      background = this.add.image(493, 300, 'kitchen').setInteractive();
+      //  Register a click anywhere on the screen
+
+      background.on('pointerdown', onPointerDown);
+
 
       //  The platforms group contains the platforms for the cake
       platforms = this.physics.add.staticGroup();
@@ -249,12 +292,18 @@ var app = {
       walls.create(-16, 300, 'wall').setVisible(false);
       walls.create(986+16, 300, 'wall').setVisible(false);
 
+      //  The fridge_wall contains the wall blocking the cake from falling down
+      fridge_wall = this.physics.add.staticGroup();
+      fridge_wall.create(765, 300, 'wall').setVisible(false);
+
 
       // The player and its settings
       cake = this.physics.add.sprite(200, 50, 'cake');
       //  Player physics properties. Give the little guy no bounce.
       cake.setBounce(0);
       cake.setCollideWorldBounds(true);
+
+      appleProjectiles = this.physics.add.group({ collideWorldBounds: true });
 
       // The dogs - currently only one
       dogs = this.physics.add.group();
@@ -334,10 +383,19 @@ var app = {
 
       //  Collide
       this.physics.add.collider(cake, platforms);
+      this.physics.add.collider(cake, fridge_wall);
+      this.physics.add.collider(appleProjectiles, bottoms);
+      this.physics.add.collider(appleProjectiles, walls);
+      this.physics.add.collider(appleProjectiles, appleProjectiles);
+
       this.physics.add.collider(dogs, bottoms);
       this.physics.add.collider(kittens, bottoms);
       this.physics.add.collider(kittens, walls, kittyHitWall, null, this);
       this.physics.add.overlap(kittens, dogs, kittyHitDog, null, this);
+
+      this.physics.add.overlap(appleProjectiles, dogs, onAppleHitDog, null, this);
+      this.physics.add.overlap(appleProjectiles, kittens, onAppleHitKitten, null, this);
+
 
       this.physics.add.overlap(cake, barks, onBarkHit, null, this);
 

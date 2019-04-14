@@ -23,8 +23,8 @@ var app = {
     var config = {
         type: Phaser.WEBGL,
         parent: 'game',
-        //width: 986,
-        //height: 600,
+        width: 986,
+        height: 600,
         physics: {
             default: 'arcade',
             arcade: {
