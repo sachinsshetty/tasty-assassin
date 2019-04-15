@@ -1,18 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Dont Eat (Me)</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
-    <style type="text/css">
-        body {
-            margin: 0;
-        }
-    </style>
-</head>
-<body>
-
-<script type="text/javascript">
 
 var config = {
     type: Phaser.AUTO,
@@ -33,13 +18,14 @@ var config = {
 };
 
 
-var LEVEL_TIME = 1*60; // in seconds
+var LEVEL_TIME = 1*60; // in seconds , 4*60; // in seconds
 var THROW_SPEED = 300;
 var FRIDGE_COOLDOWN = 5;
-var BARKING_COOLDOWN = 3; // in seconds
-var BARK_SPEED = 200;
-var SLEEPING_TIME = 5; // in seconds
-var KITTEN_SPEED = 300;
+var BARKING_COOLDOWN = 3; // in seconds, 0.2; // in seconds
+var BARK_SPEED = 200; // 400;
+var SLEEPING_TIME = 1; // in seconds
+var KITTEN_SPEED = 500;
+
 
 var background;
 var platforms;
@@ -157,7 +143,7 @@ function create ()
     walls = this.physics.add.staticGroup();
     //  The bottoms group contains the floor that cats and dogs can walk on
     bottoms = this.physics.add.staticGroup();
-    
+
     fridgeWalls = this.physics.add.staticGroup();
     fridge = fridgeWalls.create(765, 300, 'wall').setVisible(false);
     // The apple images at the fridge
@@ -235,7 +221,7 @@ function create ()
     kitty.setData('wallHitsJump', 3);
     kitty.setData('hungry', true);
     kitty.anims.play('leftCatWalk', true);
-    
+
 
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
@@ -308,8 +294,8 @@ function updateFruits (scene) {
     if (numberOfCherries <= 0) {
 		scene.events.emit('gamelost');
 	}
-	
-	
+
+
 	for (var i = 0; i < fridge.getData('apples').length; i++) {
 		fridge.getData('apples')[i].setVisible(i < numberOfApplesInFridge);
 	}
@@ -353,7 +339,7 @@ function bark(dog) {
 function update ()
 {
     catJump();
-    
+
     if (gameOver)
     {
         return;
@@ -398,7 +384,7 @@ function onPointerDown() {
 
 		appleProjectiles.create(cake.x, cake.y, 'apple')
 						.setVelocityX(appleVelocity.x)
-						.setVelocityY(appleVelocity.y);		
+						.setVelocityY(appleVelocity.y);
 		numberOfApples--;
 	}
 }
@@ -419,16 +405,16 @@ function kittyHitWall(kitty, wall) {
 	console.log('kittyHitWall');
 	kitty.setData('velocityX', -kitty.getData('velocityX'));
 	kitty.setVelocityX(kitty.getData('velocityX'));
-	
+
     catDirection(kitty);
-    
+
     if (kitty.y > 300 && kitty.getData('wallHits') >= kitty.getData('wallHitsJump')) {
 		crazyCat2Sound.play();
 		kitty.setVelocityY(-200);
 		kitty.setData('wallHitsJump', Phaser.Math.Between(1, 5));
 		kitty.setData('wallHits', 0);
     }
-    
+
     var hits = kitty.getData('wallHits');
     kitty.setData('wallHits', hits+1);
 }
@@ -502,9 +488,3 @@ function stopGame(scene) {
 	background.off('pointerdown');
 	gameOver = true;
 }
-
-
-</script>
-
-</body>
-</html>
