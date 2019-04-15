@@ -4,14 +4,16 @@ Game developed during : CS Game Jam 2019 - Uni Bonn
 
 Theme : tasty-assassin
 
-Engine : [Phaser](phaser.io)
-
 Team : LoneRangers
 
-* [Karl Welzel](https://github.com/BurningKarl)
-* [Thorsten Mehlich](www.google.com)
-* [Sachin Shetty](gaganyatri.com)
+| Name | Work |  |
+|---|---|
+| [Karl Welzel](https://github.com/BurningKarl) | core logic, sonic boom scooby, life , eatables |
+| [Thorsten Mehlich](www.google.com) | crazy schrodinger cat, background |
+| [Sachin Shetty](gaganyatri.com) | mobile controls, deployment |
 
+
+Engine/Framework : [Phaser](phaser.io)
 
 Dont Eat (ME)
 
@@ -25,7 +27,6 @@ Please provide comments and suggestions to improve the game further.
 
 Best if you open issues at
 https://github.com/sachinsshetty/tasty-assassin/issues
-
 
 
 #### Browser Game Setup
