@@ -12,6 +12,12 @@ Team : LoneRangers
 * [Thorsten Mehlich](www.google.com)
 * [Sachin Shetty](gaganyatri.com)
 
+
+#### Play Game
+* [Online](https://gaganyatri.com/tasty-assassin)
+* [Online 2](https://debentured-zebra-0226.dataplicity.io/tasty-assassin/)
+* [Android App](https://play.google.com/store/apps/details?id=com.slabstech.game.donteatme)
+
 #### Browser Game Setup
 
 * python -m SimpleHTTPServer
