@@ -1,8 +1,10 @@
+var WIDTH = 986;
+var HEIGHT = 600;
 
 var config = {
     type: Phaser.AUTO,
-    width: 986,
-    height: 600,
+    width: WIDTH,
+    height: HEIGHT,
     scene: {
         preload: preload,
         create: create,
@@ -26,9 +28,9 @@ function preload ()
 function create ()
 {
     //  A simple background for our game
-    this.add.image(493, 300, 'kitchen');
+    this.add.image(WIDTH/2, HEIGHT/2, 'kitchen');
 
-    this.add.text(493, 100, "Don't Eat (Me)", {
+    this.add.text(WIDTH/2, 100, "Don't Eat (Me)", {
 		font: '40pt Roboto', fill: '#000'
 	}).setOrigin(0.5, 0.5);
 
@@ -37,7 +39,7 @@ function create ()
     startButton = this.add.image(493, 240, 'button')
                           .setInteractive()
                           .setData('isPressed', false);
-    this.add.text(493, 235, 'Easy', textConfig)
+    this.add.text(WIDTH/2, 235, 'Easy', textConfig)
 	        .setOrigin(0.5, 0.5);
 
 	startButton.on('pointerdown', function () {
@@ -55,10 +57,10 @@ function create ()
 		}
 	});
 
-    startButton2 = this.add.image(493, 300, 'button')
+    startButton2 = this.add.image(WIDTH/2, HEIGHT/2, 'button')
                           .setInteractive()
                           .setData('isPressed', false);
-    this.add.text(493, 295, 'Hard', textConfig)
+    this.add.text(WIDTH/2, 295, 'Hard', textConfig)
 	        .setOrigin(0.5, 0.5);
 
 	startButton2.on('pointerdown', function () {
@@ -76,10 +78,10 @@ function create ()
 		}
 	});
 
-    creditsButton = this.add.image(493, 360, 'button')
+    creditsButton = this.add.image(WIDTH/2, 360, 'button')
                             .setInteractive()
                             .setData('isPressed', false);
-    this.add.text(493, 355, 'Credits', textConfig)
+    this.add.text(WIDTH/2, 355, 'Credits', textConfig)
 		    .setOrigin(0.5, 0.5);
 
 	creditsButton.on('pointerdown', function () {

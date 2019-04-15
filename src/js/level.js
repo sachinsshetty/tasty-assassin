@@ -1,12 +1,25 @@
 
+var WIDTH = 986;
+var HEIGHT = 600;
+
+var GRAVITY = 500;
+var LEVEL_TIME = 1*60; // in seconds , 4*60; // in seconds
+var THROW_SPEED = 300;
+var FRIDGE_COOLDOWN = 5;
+var BARKING_COOLDOWN = 3; // in seconds, 0.2; // in seconds
+var BARK_SPEED = 200; // 400;
+var SLEEPING_TIME = 1; // in seconds
+var KITTEN_SPEED = 500;
+var TIME_MULTIPLIER = 1000;
+
 var config = {
     type: Phaser.AUTO,
-    width: 986,
-    height: 600,
+    width: WIDTH,
+    height: HEIGHT,
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 500 },
+            gravity: { y: GRAVITY },
             debug: false
         }
     },
@@ -16,16 +29,6 @@ var config = {
         update: update
     }
 };
-
-
-var LEVEL_TIME = 1*60; // in seconds , 4*60; // in seconds
-var THROW_SPEED = 300;
-var FRIDGE_COOLDOWN = 5;
-var BARKING_COOLDOWN = 3; // in seconds, 0.2; // in seconds
-var BARK_SPEED = 200; // 400;
-var SLEEPING_TIME = 1; // in seconds
-var KITTEN_SPEED = 500;
-
 
 var background;
 var platforms;
@@ -133,7 +136,7 @@ function create ()
 	});
 
     //  A simple background for our game
-    background = this.add.image(493, 300, 'kitchen').setInteractive();
+    background = this.add.image(WIDTH/2, HEIGHT/2, 'kitchen').setInteractive();
     //  Register a click anywhere on the screen
     background.on('pointerdown', onPointerDown);
 
@@ -145,13 +148,13 @@ function create ()
     bottoms = this.physics.add.staticGroup();
 
     fridgeWalls = this.physics.add.staticGroup();
-    fridge = fridgeWalls.create(765, 300, 'wall').setVisible(false);
+    fridge = fridgeWalls.create(765, HEIGHT/2, 'wall').setVisible(false);
     // The apple images at the fridge
-    fridge.setData('apples', [this.add.image(800, 280, 'apple'),
-                              this.add.image(824, 280, 'apple'),
-                              this.add.image(848, 280, 'apple')]);
+    fridge.setData('apples', [this.add.image(800, (HEIGHT/2) - 20, 'apple'),
+                              this.add.image(824, (HEIGHT/2) - 20, 'apple'),
+                              this.add.image(848, (HEIGHT/2) - 20, 'apple')]);
     fridge.setData('appleTimer', this.time.addEvent({
-		delay: FRIDGE_COOLDOWN*1000,
+		delay: FRIDGE_COOLDOWN*TIME_MULTIPLIER,
 		callbackScope: this,
 		loop: true,
 		callback: function () {
@@ -169,8 +172,8 @@ function create ()
     bottoms.create(493, 616, 'bottom').setVisible(false);
 
     //  Here we create walls to the right and to the left of the screen
-    walls.create(-16, 300, 'wall').setVisible(false);
-    walls.create(986+16, 300, 'wall').setVisible(false);
+    walls.create(-16, HEIGHT/2, 'wall').setVisible(false);
+    walls.create(986+16, HEIGHT/2, 'wall').setVisible(false);
 
 
     // The player and its settings
@@ -185,7 +188,7 @@ function create ()
     dogs = this.physics.add.group();
     dog = dogs.create(100, 536, 'dog');
     dog.setData('barkingTimer', this.time.addEvent({
-		delay: BARKING_COOLDOWN*1000,
+		delay: BARKING_COOLDOWN*TIME_MULTIPLIER,
 		callbackScope: this,
 		loop: true,
 		callback: function () {
@@ -195,7 +198,7 @@ function create ()
 
 
     dog.setData('sleepingTimer', this.time.addEvent({
-		delay: SLEEPING_TIME*1000,
+		delay: SLEEPING_TIME*TIME_MULTIPLIER,
 		callbackScope: this,
 		loop: true,
 		paused: true,
@@ -260,7 +263,7 @@ function create ()
 
 	// The time
 	gameWonEvent = this.time.addEvent({
-		delay: LEVEL_TIME*1000,
+		delay: LEVEL_TIME*TIME_MULTIPLIER,
 		callback: onGameWon,
 		callbackScope: this
 		});
@@ -474,12 +477,12 @@ function onBarkHit(cake, bark) {
 
 function onGameWon () {
 	stopGame(this);
-	this.add.text(493, 300, 'You won', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
+	this.add.text(WIDTH/2, HEIGHT/2, 'You won', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
 }
 
 function onGameLost () {
 	stopGame(this);
-	this.add.text(493, 300, 'You lost', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
+	this.add.text(WIDTH/2, HEIGHT/2, 'You lost', {font: '40pt Roboto', fill: '#000'}).setOrigin(0.5, 0.5);
 }
 
 function stopGame(scene) {
