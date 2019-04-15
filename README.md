@@ -13,10 +13,20 @@ Team : LoneRangers
 * [Sachin Shetty](gaganyatri.com)
 
 
+Dont Eat (ME)
+
+Save the cake from the hungry pets
+
 #### Play Game
-* [Online](https://gaganyatri.com/tasty-assassin)
-* [Online 2](https://debentured-zebra-0226.dataplicity.io/tasty-assassin/)
+* [Browser](https://sachinsshetty.github.io/tasty-assassin/)
 * [Android App](https://play.google.com/store/apps/details?id=com.slabstech.game.donteatme)
+
+Please provide comments and suggestions to improve the game further.
+
+Best if you open issues at
+https://github.com/sachinsshetty/tasty-assassin/issues
+
+
 
 #### Browser Game Setup
 
