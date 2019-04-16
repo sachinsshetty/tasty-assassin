@@ -1,22 +1,5 @@
 # Dont Eat (Me)
 
-Game developed during : CS Game Jam 2019 - Uni Bonn
-
-Theme : tasty-assassin
-
-Team : LoneRangers
-
-| Name | Work |  |
-|---|---|
-| [Karl Welzel](https://github.com/BurningKarl) | core logic, sonic boom scooby, life , eatables |
-| [Thorsten Mehlich](www.google.com) | crazy schrodinger cat, background |
-| [Sachin Shetty](gaganyatri.com) | mobile controls, deployment |
-
-
-Engine/Framework : [Phaser](phaser.io)
-
-Dont Eat (ME)
-
 Save the cake from the hungry pets
 
 #### Play Game
@@ -25,8 +8,22 @@ Save the cake from the hungry pets
 
 Please provide comments and suggestions to improve the game further.
 
-Best if you open issues at
-https://github.com/sachinsshetty/tasty-assassin/issues
+Best if you open issues at [https://github.com/sachinsshetty/tasty-assassin/issues](
+https://github.com/sachinsshetty/tasty-assassin/issues)
+
+* Game developed during : CS Game Jam 2019 - Uni Bonn
+
+* Theme : tasty-assassin
+
+* Team : LoneRangers
+
+| Name | Work |
+|---|---|
+| [Karl Welzel](https://github.com/BurningKarl) | core logic, sonic boom, scooby doo, life, eatables |
+| [Thorsten Mehlich](www.google.com) | crazy schrodinger cat, background |
+| [Sachin Shetty](gaganyatri.com) | mobile controls, deployment |
+
+* Engine/Framework : [Phaser](phaser.io)
 
 
 #### Browser Game Setup

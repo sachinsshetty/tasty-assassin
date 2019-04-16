@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <title>Dont Eat (Me)</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="js/credit.js"></script>
+
     <style type="text/css">
         body {
             margin: 0;
@@ -11,59 +13,6 @@
     </style>
 </head>
 <body>
-
-<script type="text/javascript">
-
-var config = {
-    type: Phaser.AUTO,
-    width: 986,
-    height: 600,
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-};
-
-
-var game = new Phaser.Game(config);
-
-function preload ()
-{
-	// Background
-    this.load.image('kitchen', 'assets/kitchen_credit.png');
-}
-
-function create ()
-{
-    //  A simple background for our game
-    this.add.image(493, 300, 'kitchen');  
-    
-    textConfig =  {font: '40pt Roboto', fill: '#000'}
-    
-    this.add.text(493, 100, 'Credits', textConfig).setOrigin(0.5, 0.5);
-    
-    this.add.text(493, 350, "Code: Thorsten Mehlich, Sachin Shetty and Karl Welzel \nAssets: \n\nhttps://opengameart.org/content/rusty \nhttps://commons.wikimedia.org/wiki/File:Cartoon_Happy_Birthday_Cake.svg https://henrysoftware.itch.io/pixel-food \nhttps://en.wikipedia.org/wiki/File:Icon_sound_loudspeaker.svg \nhttps://www.zapsplat.com/music/dog-barking-3/ \nhttps://opengameart.org/content/ui-pack", 
-    {
-		font: '20pt Roboto', 
-		fill: '#000',
-		wordWrap: {
-			width: 800,
-			callback: null,
-			callbackScope: null,
-			useAdvancedWrap: false
-		}
-	}).setOrigin(0.5, 0.5);
-
-}
-
-function update ()
-{
- 
-}
-
-
-</script>
 
 </body>
 </html>
