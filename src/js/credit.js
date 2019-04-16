@@ -37,7 +37,7 @@ function create ()
     creditText += "https://www.zapsplat.com/music/dog-barking-3/ \n"
     creditText += "https://opengameart.org/content/ui-pack"
 
-    this.add.text(WIDTH/2, 350, , creditText
+    this.add.text(WIDTH/2, 350, creditText,
     {
 		font: '20pt Roboto',
 		fill: '#000',
