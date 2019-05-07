@@ -102,12 +102,12 @@ function create ()
         if (startButton.getData('isPressed')) {
             startButton.setData('isPressed', false);
             startButton.setTexture('button');
-            location.href = 'src/level.html';
+            location.href = 'src/level1.html';
         }
         if (startButton2.getData('isPressed')) {
             startButton2.setData('isPressed', false);
             startButton2.setTexture('button');
-            location.href = 'src/level.html';
+            location.href = 'src/level2.html';
         }
         if (creditsButton.getData('isPressed')) {
             creditsButton.setData('isPressed', false);
