@@ -3,6 +3,8 @@ var WIDTH = 986;
 var HEIGHT = 600;
 
 var GRAVITY = 500;
+var TIME_MULTIPLIER = 1000;
+
 var LEVEL_TIME = 1*60; // in seconds , 4*60; // in seconds
 var THROW_SPEED = 300;
 var FRIDGE_COOLDOWN = 5;
@@ -10,7 +12,7 @@ var BARKING_COOLDOWN = 3; // in seconds, 0.2; // in seconds
 var BARK_SPEED = 200; // 400;
 var SLEEPING_TIME = 1; // in seconds
 var KITTEN_SPEED = 500;
-var TIME_MULTIPLIER = 1000;
+var CAKE_SPEED = 160;
 
 var config = {
     type: Phaser.AUTO,
@@ -173,7 +175,7 @@ function create ()
 
     //  Here we create walls to the right and to the left of the screen
     walls.create(-16, HEIGHT/2, 'wall').setVisible(false);
-    walls.create(986+16, HEIGHT/2, 'wall').setVisible(false);
+    walls.create(WIDTH+16, HEIGHT/2, 'wall').setVisible(false);
 
 
     // The player and its settings
@@ -350,12 +352,12 @@ function update ()
 
     if (cursors.left.isDown)
     {
-        cake.setVelocityX(-160);
+        cake.setVelocityX(-CAKE_SPEED);
         cake.anims.play('left', true);
      }
 	else if (cursors.right.isDown)
 	{
-		cake.setVelocityX(160);
+		cake.setVelocityX(CAKE_SPEED);
 		cake.anims.play('right', true);
 	}
 	else
