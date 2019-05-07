@@ -31,15 +31,15 @@ function create ()
 
     this.add.text(WIDTH/2, 200, "Code: Thorsten Mehlich, Karl Welzel and Sachin Shetty",
     {
-		font: '20pt Roboto',
-		fill: '#000',
-		wordWrap: {
-			width: 1000,
-			callback: null,
-			callbackScope: null,
-			useAdvancedWrap: false
-		}
-	}).setOrigin(0.5, 0.5);
+        font: '20pt Roboto',
+        fill: '#000',
+        wordWrap: {
+            width: 1000,
+            callback: null,
+            callbackScope: null,
+            useAdvancedWrap: false
+        }
+    }).setOrigin(0.5, 0.5);
 
     var creditText = "Assets: \n";
     creditText += "Buttons: https://opengameart.org/content/ui-pack \n";
@@ -53,15 +53,15 @@ function create ()
 
     this.add.text(WIDTH/2, 350, creditText,
     {
-		font: '9pt Roboto',
-		fill: '#000',
-		wordWrap: {
-			width: 1000,
-			callback: null,
-			callbackScope: null,
-			useAdvancedWrap: false
-		}
-	}).setOrigin(0.5, 0.5);
+        font: '9pt Roboto',
+        fill: '#000',
+        wordWrap: {
+            width: 1000,
+            callback: null,
+            callbackScope: null,
+            useAdvancedWrap: false
+        }
+    }).setOrigin(0.5, 0.5);
 
 }
 
