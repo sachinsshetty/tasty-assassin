@@ -1,7 +1,7 @@
 
-# Dont Eat (Me)
+# Don't Eat (Me)
 
-Save the cake from the hungry pets
+Save the cake from the hungry pets.
 
 * Game developed during CS Game Jam 2019 - Uni Bonn
 * Theme: Tasty assassin
