@@ -3,13 +3,13 @@
 Save the cake from the hungry pets
 
 #### Play Game
-* [Browser](https://sachinsshetty.github.io/tasty-assassin/)
+* [Browser](https://slabs.tech/tasty-assassin/)
 * [Android App](https://play.google.com/store/apps/details?id=com.slabstech.game.donteatme)
 
 Please provide comments and suggestions to improve the game further.
 
-Best if you open issues at [https://github.com/sachinsshetty/tasty-assassin/issues](
-https://github.com/sachinsshetty/tasty-assassin/issues)
+Best if you open issues at [https://github.com/slabstech/tasty-assassin/issues](
+https://github.com/slabstech/tasty-assassin/issues)
 
 * Game developed during : CS Game Jam 2019 - Uni Bonn
 
