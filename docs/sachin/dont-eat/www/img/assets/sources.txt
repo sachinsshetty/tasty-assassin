@@ -1,8 +1,0 @@
-dog -> https://opengameart.org/content/rusty
-kitchen -> ???
-cake -> ???
-cake2 -> https://commons.wikimedia.org/wiki/File:Cartoon_Happy_Birthday_Cake.svg
-food -> https://henrysoftware.itch.io/pixel-food
-barking -> https://en.wikipedia.org/wiki/File:Icon_sound_loudspeaker.svg
-barkingSound -> https://www.zapsplat.com/music/dog-barking-3/
-buttons -> https://opengameart.org/content/ui-pack
